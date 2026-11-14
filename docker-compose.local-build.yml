@@ -1,0 +1,26 @@
+# Run the production stack from this checkout instead of the published
+# images. docker-compose.prod.yml only pulls ghcr.io/securo-finance/*:latest,
+# so changes in this repository never reach it; this override builds them.
+#
+#   docker compose -f docker-compose.prod.yml -f docker-compose.local-build.yml up -d --build
+#
+# All backend services share one locally built image. `pull_policy: build`
+# keeps `docker compose pull` from looking for the local tags in a registry.
+
+x-local-backend: &local-backend
+  build: ./backend
+  image: securo-backend:local
+  pull_policy: build
+
+services:
+  migrate: *local-backend
+  backend: *local-backend
+  celery-worker: *local-backend
+  celery-beat: *local-backend
+  mcp-server: *local-backend
+  plugins-runner: *local-backend
+  plugins-egress: *local-backend
+  frontend:
+    build: ./frontend
+    image: securo-frontend:local
+    pull_policy: build
