@@ -62,17 +62,58 @@ export function embeddingText(description: string, payee?: string | null): strin
     .trim()
 }
 
-export function lexicalProfile(text: string): LexicalProfile {
-  const words = text
+function words(text: string): string[] {
+  return text
     .toLowerCase()
     .split(/[^\p{L}\p{N}]+/u)
     .filter((word) => word.length >= 3 && !/^\d+$/.test(word) && !BOOKING_WORDS.has(word))
+}
+
+/** Share of texts a word must reach before it counts as boilerplate. */
+const COMMON_SHARE = 0.2
+/** A word in fewer texts than this is never boilerplate, whatever the share. */
+const COMMON_MIN_COUNT = 5
+
+/**
+ * Words that appear in so many of a user's transactions that they cannot
+ * name a merchant: the bank's own boilerplate, in whatever language it
+ * writes it ("visa debitkartenumsatz vom", "compra cartão", ...). Counted
+ * once per text. A single merchant rarely reaches a fifth of all rows,
+ * so its name survives.
+ */
+export function commonWords(texts: string[]): Set<string> {
+  const counts = new Map<string, number>()
+  for (const text of texts) {
+    for (const word of new Set(words(text))) counts.set(word, (counts.get(word) ?? 0) + 1)
+  }
+  const threshold = Math.max(COMMON_MIN_COUNT, texts.length * COMMON_SHARE)
+  return new Set([...counts].filter(([, count]) => count >= threshold).map(([word]) => word))
+}
+
+/**
+ * The text with boilerplate removed: booking words, words in `common`, and
+ * tokens without a letter (dates, amounts, masked numbers). What is left is
+ * what can tell one merchant from another, and may well be nothing.
+ */
+export function distinctiveText(text: string, common: Set<string>): string {
+  return text
+    .split(/\s+/)
+    .filter((token) => {
+      if (!/\p{L}/u.test(token)) return false
+      const tokenWords = words(token)
+      return tokenWords.length > 0 && tokenWords.some((word) => !common.has(word))
+    })
+    .join(' ')
+}
+
+export function lexicalProfile(text: string): LexicalProfile {
+  const found = words(text)
   const trigrams = new Set<string>()
-  for (const word of words) {
+  for (const word of found) {
     const padded = ` ${word} `
     for (let i = 0; i < padded.length - 2; i++) trigrams.add(padded.slice(i, i + 3))
   }
-  return { words, trigrams }
+  return { words: found, trigrams }
 }
 
 /** Dice coefficient of the two texts' character trigrams. */

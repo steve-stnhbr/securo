@@ -8,6 +8,7 @@ import { CategoryIcon } from '@/components/category-icon'
 import { TransactionCategoryIcon } from '@/components/category-lines-display'
 import { isSplitByCategory } from '@/lib/category-lines'
 import { ProjectedTransactionBadge } from '@/components/projected-transaction-badge'
+import { SuggestTransactionsAction } from '@/components/suggest-transactions-action'
 import { sumDrillDownTotals } from '@/lib/drill-down-totals'
 import { hasOpenDialog, isInsideOverlayLayer } from '@/lib/overlay-layers'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -357,6 +358,9 @@ export function TransactionDrillDown({
           <h2 className="text-sm font-semibold text-foreground truncate pr-4">
             {filter?.title}
           </h2>
+          {filter?.uncategorized && data?.items && (
+            <SuggestTransactionsAction transactions={data.items} className="ml-auto mr-2 shrink-0" />
+          )}
           <button
             onClick={onClose}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors shrink-0"

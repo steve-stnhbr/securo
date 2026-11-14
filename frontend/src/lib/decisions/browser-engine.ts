@@ -1,7 +1,14 @@
 import { transactions as transactionsApi, type DecisionSuggestion } from '@/lib/api'
 import type { Transaction } from '@/types'
 import type { EmbedRequest, EmbedResponse } from './embed.worker'
-import { embeddingText, lexicalProfile, suggestFromNeighbours, type LabelledExample } from './knn'
+import {
+  commonWords,
+  distinctiveText,
+  embeddingText,
+  lexicalProfile,
+  suggestFromNeighbours,
+  type LabelledExample,
+} from './knn'
 
 /** How much history the browser engine learns from: the latest labelled rows. */
 const HISTORY_PAGES = 4
@@ -76,16 +83,25 @@ export async function suggestInBrowser(
 ): Promise<DecisionSuggestion[]> {
   onProgress?.({ stage: 'history' })
   const history = await labelledHistory(new Set(targets.map((tx) => tx.id)))
-  if (!history.length) {
-    return targets.map((tx) => suggestFromNeighbours(tx.id, [], lexicalProfile(''), tx.type, []))
-  }
-  const historyTexts = history.map((tx) => embeddingText(tx.description, tx.payee))
-  const targetTexts = targets.map((tx) => embeddingText(tx.description, tx.payee))
-  const vectors = await embedCached(model, [...historyTexts, ...targetTexts], onProgress)
+  const raw = (tx: Transaction) => embeddingText(tx.description, tx.payee)
+  // Boilerplate is judged over everything in view, so a bank that writes
+  // "VISA Debitkartenumsatz vom ..." on every line does not make all of
+  // them look like one merchant.
+  const common = commonWords([...history, ...targets].map(raw))
+  const text = (tx: Transaction) => distinctiveText(raw(tx), common)
+  // A row left with no distinctive word cannot be told from any other, so
+  // it neither votes nor gets a suggestion.
+  const labelled = history.map((tx) => ({ tx, text: text(tx) })).filter((row) => row.text)
+  const asked = targets.map((tx) => ({ tx, text: text(tx) }))
+  const answerable = asked.filter((row) => row.text)
+  const none = (tx: Transaction) => suggestFromNeighbours(tx.id, [], lexicalProfile(''), tx.type, [])
+  if (!labelled.length || !answerable.length) return targets.map(none)
+
+  const vectors = await embedCached(model, [...labelled, ...answerable].map((row) => row.text), onProgress)
   onProgress?.({ stage: 'embedding' })
-  const examples: LabelledExample[] = history.map((tx, i) => ({
+  const examples: LabelledExample[] = labelled.map(({ tx, text }, i) => ({
     vector: vectors[i],
-    lexical: lexicalProfile(historyTexts[i]),
+    lexical: lexicalProfile(text),
     type: tx.type,
     categoryId: tx.category_id,
     payeeId: tx.payee_id,
@@ -93,7 +109,11 @@ export async function suggestInBrowser(
     transfer: tx.transfer_pair_id !== null,
     recurring: Boolean(tx.recurring_transaction_id),
   }))
-  return targets.map((tx, i) =>
-    suggestFromNeighbours(tx.id, vectors[history.length + i], lexicalProfile(targetTexts[i]), tx.type, examples),
-  )
+  const vectorOf = new Map(answerable.map((row, i) => [row.tx.id, vectors[labelled.length + i]]))
+  return asked.map(({ tx, text }) => {
+    const vector = vectorOf.get(tx.id)
+    return vector
+      ? suggestFromNeighbours(tx.id, vector, lexicalProfile(text), tx.type, examples)
+      : none(tx)
+  })
 }

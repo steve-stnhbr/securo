@@ -1,6 +1,6 @@
 # Transaction suggestions
 
-Securo can suggest a category and a payee for uncategorized transactions, and flag rows that look like a transfer between own accounts or a recurring charge. An administrator picks the engine in **Admin Settings → Transaction suggestions**. Members with write access then get a **Suggest** button on the Transactions page. It covers the uncategorized rows on screen. Suggestions with a confidence of 80% or more start selected; nothing is applied until the user confirms.
+Securo can suggest a category and a payee for uncategorized transactions, and flag rows that look like a transfer between own accounts or a recurring charge. An administrator picks the engine in **Admin Settings → Transaction suggestions**. Members with write access then get a **Suggest** button on the Transactions page, for the uncategorized rows on screen, and in the dashboard's **Uncategorized transactions** panel, for all of them. Suggestions with a confidence of 80% or more start selected; nothing is applied until the user confirms.
 
 Neither engine replaces rules. Rules run first on import and stay the deterministic, auditable path. Suggestions only cover what rules did not.
 
@@ -14,7 +14,7 @@ Neither engine replaces rules. Rules run first on import and stay the determinis
 
 ### In the browser
 
-The browser embeds the user's latest 2,000 transactions with a small sentence-embedding model (default `Xenova/paraphrase-multilingual-MiniLM-L12-v2`, multilingual). Only transactions with a category or payee are used. Each uncategorized row then takes a vote from its nearest neighbours. Similarity is the better of the embedding's cosine and a character-trigram overlap. The embedding groups similar kinds of shop, which helps choose the category. The trigram overlap catches one merchant written two ways. Payees are only voted on by neighbours that look like the same merchant. The ONNX runtime is served by Securo itself and is loaded only when the dialog is opened.
+The browser embeds the user's latest 2,000 transactions with a small sentence-embedding model (default `Xenova/paraphrase-multilingual-MiniLM-L12-v2`, multilingual). Only transactions with a category or payee are used. Words that appear in a fifth or more of the user's transactions (and at least five) are treated as the bank's boilerplate and dropped first, so lines such as `VISA Debitkartenumsatz vom 14.08.2026` are compared only on what follows. A row with nothing left, typically one whose merchant the bank sent in no field at all, gets no suggestion. Each remaining uncategorized row then takes a vote from its nearest neighbours. Similarity is the better of the embedding's cosine and a character-trigram overlap. The embedding groups similar kinds of shop, which helps choose the category. The trigram overlap catches one merchant written two ways. Payees are only voted on by neighbours that look like the same merchant. The ONNX runtime is served by Securo itself and is loaded only when the dialog is opened.
 
 Any Hugging Face sentence-embedding model with ONNX weights can be set instead (for example `onnx-community/embeddinggemma-300m-ONNX`). Quality depends on how much labelled history a user has. With none, there are no suggestions.
 
