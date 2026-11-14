@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { transactions as transactionsApi, type DecisionConfig, type DecisionSuggestion } from '@/lib/api'
 import { AUTO_SELECT_CONFIDENCE, suggestTransactions, type EngineProgress } from '@/lib/decisions/engine'
+import { counterpartyDetails } from '@/lib/counterparty'
 import { invalidateFinancialQueries } from '@/lib/invalidate-queries'
+import { usePrivacyMode } from '@/hooks/use-privacy-mode'
 import type { Category, Transaction } from '@/types'
 
 /** Above this, a transfer or recurring hint is shown on the row. */
@@ -27,6 +29,7 @@ const percent = (value: number | null) => (value === null ? '' : `${Math.round(v
 
 export function SuggestTransactionsDialog({ open, onOpenChange, config, transactions, categories }: Props) {
   const { t } = useTranslation()
+  const { mask } = usePrivacyMode()
   const queryClient = useQueryClient()
   const [progress, setProgress] = useState<EngineProgress | null>(null)
   const [suggestions, setSuggestions] = useState<DecisionSuggestion[] | null>(null)
@@ -135,6 +138,19 @@ export function SuggestTransactionsDialog({ open, onOpenChange, config, transact
                   />
                   <label htmlFor={id} className="min-w-0 flex-1 space-y-1">
                     <span className="block truncate text-sm font-medium">{tx.description}</span>
+                    {(() => {
+                      // Who is on the other side: what the suggestion was made from
+                      // when the description is only the bank's booking text.
+                      const counterparty = counterpartyDetails(tx)
+                      if (!counterparty) return null
+                      return (
+                        <span className="block truncate text-xs text-muted-foreground" data-testid="suggestion-counterparty">
+                          {counterparty.name}
+                          {counterparty.name && counterparty.account && ' · '}
+                          {counterparty.account && <span className="font-mono">{mask(counterparty.account)}</span>}
+                        </span>
+                      )
+                    })()}
                     <span className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
                       {s.category_id && (
                         <Badge variant="outline">

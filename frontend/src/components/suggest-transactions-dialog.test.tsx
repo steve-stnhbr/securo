@@ -17,7 +17,7 @@ vi.mock('@/lib/decisions/engine', () => ({
 }))
 
 const rows = [
-  { id: 't1', description: 'BILLA DANKT', payee_id: null },
+  { id: 't1', description: 'VISA Debitkartenumsatz vom 14.08.2026', payee_id: null, counterparty_name: 'BILLA AG', counterparty_account: 'AT611904300234573201' },
   { id: 't2', description: 'NETFLIX.COM', payee_id: 'already-set' },
   { id: 't3', description: 'UNKNOWN SHOP', payee_id: null },
 ] as Transaction[]
@@ -55,7 +55,8 @@ describe('suggest transactions dialog', () => {
       />,
     )
 
-    const billa = await screen.findByRole('checkbox', { name: /BILLA DANKT/ })
+    const billa = await screen.findByRole('checkbox', { name: /VISA Debitkartenumsatz/ })
+    expect(screen.getByTestId('suggestion-counterparty')).toHaveTextContent('BILLA AG · AT61 1904 3002 3457 3201')
     const netflix = screen.getByRole('checkbox', { name: /NETFLIX\.COM/ })
     expect(billa).toBeChecked()
     expect(netflix).not.toBeChecked()
