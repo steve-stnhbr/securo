@@ -68,6 +68,20 @@ describe('TransactionDrillDown', () => {
     expect(screen.getByText(/part of €100.00/)).toBeInTheDocument()
   })
 
+  it('names the counterparty and its IBAN under the booking text', async () => {
+    vi.mocked(transactions.list).mockResolvedValue({
+      items: [{
+        id: 'visa', description: 'VISA Debitkartenumsatz vom 14.08.2026', date: '2026-11-10', type: 'debit',
+        amount: 18.73, amount_primary: 18.73, currency: 'USD', status: 'posted', category_id: null, category: null,
+        payee: null, payee_name: null, counterparty_name: 'BILLA AG', counterparty_account: 'AT611904300234573201',
+        splits: [], category_lines: [],
+      }],
+      total: 1,
+    } as never)
+    renderWithProviders(<TransactionDrillDown filter={filter} onClose={vi.fn()} />)
+    expect(await screen.findByTestId('drill-down-counterparty')).toHaveTextContent('BILLA AG · AT61 1904 3002 3457 3201')
+  })
+
   it('closes on a click outside the panel', async () => {
     const { onClose } = renderPanel({ dialogOpen: false })
     await waitForOutsideClickListener()

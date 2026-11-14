@@ -18,6 +18,7 @@ const unit = (...values: number[]) => {
 const example = (vector: number[], text: string, overrides: Partial<LabelledExample> = {}): LabelledExample => ({
   vector,
   lexical: lexicalProfile(text),
+  account: null,
   type: 'debit',
   categoryId: 'groceries',
   payeeId: null,
@@ -118,5 +119,27 @@ describe('boilerplate', () => {
     const a = lexicalProfile(distinctiveText('visa debitkartenumsatz vom 14.08.# billa dankt', common))
     const b = lexicalProfile(distinctiveText('visa debitkartenumsatz vom 15.08.# spar dankt', common))
     expect(sameMerchant(a, b)).toBe(false)
+  })
+})
+
+describe('counterparty account', () => {
+  it('matches the same IBAN exactly, whatever the text', () => {
+    const suggestion = suggestFromNeighbours(
+      't1', [], lexicalProfile(''), 'debit',
+      [
+        example([], '', { account: 'AT611904300234573201', categoryId: 'rent', payeeId: 'landlord', payeeName: 'Landlord' }),
+        example(unit(1, 0), 'miete', { account: 'DE00', categoryId: 'other' }),
+      ],
+      {},
+      'AT611904300234573201',
+    )
+    expect(suggestion.category_id).toBe('rent')
+    expect(suggestion.category_confidence).toBe(1)
+    expect(suggestion.payee_name).toBe('Landlord')
+  })
+
+  it('does not match rows that only share an empty text', () => {
+    const suggestion = suggestFromNeighbours('t1', [], lexicalProfile(''), 'debit', [example([], '')])
+    expect(suggestion.category_id).toBeNull()
   })
 })

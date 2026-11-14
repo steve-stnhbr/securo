@@ -249,11 +249,24 @@ class TransactionRead(TransactionBase):
     # when no real rate is available (#1165).
     running_balance: Optional[float] = None
     running_balance_primary: Optional[float] = None
+    # The other side of the transaction as the bank sent it, read from the
+    # raw provider data: what suggestions learn from when the description
+    # is only booking text. Withheld from a viewer who sees the row through
+    # a shared split, since it is the owner's bank data.
+    counterparty_name: Optional[str] = None
+    counterparty_account: Optional[str] = None
 
     @model_validator(mode="after")
     def reflect_ignored_category(self):
         if self.category and self.category.is_ignored:
             self.is_ignored = True
+        return self
+
+    @model_validator(mode="after")
+    def withhold_counterparty_from_shares(self):
+        if self.is_shared:
+            self.counterparty_name = None
+            self.counterparty_account = None
         return self
 
     model_config = ConfigDict(from_attributes=True)

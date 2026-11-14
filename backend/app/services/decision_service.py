@@ -18,8 +18,9 @@ whether it looks like a transfer between own accounts or a recurring
 charge. The last two are hints; pairing and recurring-bill matching stay
 with their own services.
 
-Only what the questions need is sent: the description and payee text with
-IBANs and long digit runs masked, the direction, amount and currency.
+Only what the questions need is sent: the description, payee and the
+bank's counterparty name with IBANs and long digit runs masked, the
+direction, amount and currency. The counterparty's account is not.
 """
 
 import asyncio
@@ -105,13 +106,19 @@ def payee_shortlist(text: str, payees: list[Payee]) -> dict[str, uuid.UUID]:
 
 def transaction_state(tx: Transaction) -> dict[str, Any]:
     amount = abs(tx.amount)
-    return {
+    state: dict[str, Any] = {
         "description": redact(tx.description),
         "payee": redact(tx.payee) or None,
         "direction": "money out" if tx.type == "debit" else "money in",
         "amount": f"{amount:.2f}",
         "currency": tx.currency,
     }
+    # The bank's counterparty name, when the stored payee does not already
+    # carry it. Its account number (IBAN) is never sent.
+    counterparty = tx.counterparty_name
+    if counterparty and counterparty != tx.payee:
+        state["counterparty"] = redact(counterparty)
+    return state
 
 
 def build_request(
@@ -260,7 +267,9 @@ async def suggest(
     limiter = asyncio.Semaphore(CONCURRENCY)
 
     async def one(http: httpx.AsyncClient, tx: Transaction) -> dict[str, Any]:
-        payees = payee_shortlist(f"{tx.payee or ''} {tx.description}", context.payees)
+        payees = payee_shortlist(
+            f"{tx.payee or ''} {tx.counterparty_name or ''} {tx.description}", context.payees
+        )
         body = build_request(settings.remote_model, tx, context.categories, payees)
         async with limiter:
             try:

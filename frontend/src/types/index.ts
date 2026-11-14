@@ -301,6 +301,10 @@ export interface Transaction {
   payee_id: string | null
   payee_name: string | null
   notes: string | null
+  /** The other side's name as the bank sent it, from the raw provider data. */
+  counterparty_name?: string | null
+  /** The other side's IBAN (or local account number), from the raw provider data. */
+  counterparty_account?: string | null
   transfer_pair_id: string | null
   /**
    * The other leg of the transfer this row belongs to, when it is one.

@@ -10,6 +10,7 @@ import { isSplitByCategory } from '@/lib/category-lines'
 import { ProjectedTransactionBadge } from '@/components/projected-transaction-badge'
 import { SuggestTransactionsAction } from '@/components/suggest-transactions-action'
 import { sumDrillDownTotals } from '@/lib/drill-down-totals'
+import { counterpartyDetails } from '@/lib/counterparty'
 import { hasOpenDialog, isInsideOverlayLayer } from '@/lib/overlay-layers'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAuth } from '@/contexts/auth-context'
@@ -438,6 +439,19 @@ export function TransactionDrillDown({
                         <Paperclip size={12} className="text-muted-foreground shrink-0" />
                       )}
                     </div>
+                    {(() => {
+                      const counterparty = item.transaction && counterpartyDetails(item.transaction)
+                      if (!counterparty) return null
+                      return (
+                        <p className="text-xs text-muted-foreground truncate" data-testid="drill-down-counterparty">
+                          {counterparty.name}
+                          {counterparty.name && counterparty.account && ' · '}
+                          {counterparty.account && (
+                            <span className="font-mono">{mask(counterparty.account)}</span>
+                          )}
+                        </p>
+                      )
+                    })()}
                     <p className="text-xs text-muted-foreground">
                       {new Date(item.date + 'T00:00:00').toLocaleDateString(dateLocale)}
                       {item.categoryName && ` · ${item.categoryName}`}

@@ -83,7 +83,9 @@ export async function suggestInBrowser(
 ): Promise<DecisionSuggestion[]> {
   onProgress?.({ stage: 'history' })
   const history = await labelledHistory(new Set(targets.map((tx) => tx.id)))
-  const raw = (tx: Transaction) => embeddingText(tx.description, tx.payee)
+  // The stored payee, or else the name the bank sent for the other side
+  // (absent when the connection's payee source is "description" or "none").
+  const raw = (tx: Transaction) => embeddingText(tx.description, tx.payee ?? tx.counterparty_name)
   // Boilerplate is judged over everything in view, so a bank that writes
   // "VISA Debitkartenumsatz vom ..." on every line does not make all of
   // them look like one merchant.
@@ -91,17 +93,24 @@ export async function suggestInBrowser(
   const text = (tx: Transaction) => distinctiveText(raw(tx), common)
   // A row left with no distinctive word cannot be told from any other, so
   // it neither votes nor gets a suggestion.
-  const labelled = history.map((tx) => ({ tx, text: text(tx) })).filter((row) => row.text)
+  // An account match needs no text, so such rows stay in.
+  const labelled = history.map((tx) => ({ tx, text: text(tx) })).filter((row) => row.text || row.tx.counterparty_account)
   const asked = targets.map((tx) => ({ tx, text: text(tx) }))
-  const answerable = asked.filter((row) => row.text)
+  const answerable = asked.filter((row) => row.text || row.tx.counterparty_account)
   const none = (tx: Transaction) => suggestFromNeighbours(tx.id, [], lexicalProfile(''), tx.type, [])
   if (!labelled.length || !answerable.length) return targets.map(none)
 
-  const vectors = await embedCached(model, [...labelled, ...answerable].map((row) => row.text), onProgress)
+  // Only text is embedded. A row known by its account alone gets no
+  // vector: every empty string embeds alike and would match all the others.
+  const texts = [...new Set([...labelled, ...answerable].map((row) => row.text).filter(Boolean))]
+  const embedded = await embedCached(model, texts, onProgress)
+  const vectorFor = new Map(texts.map((text, i) => [text, embedded[i]]))
+  const vector = (text: string): number[] => vectorFor.get(text) ?? []
   onProgress?.({ stage: 'embedding' })
-  const examples: LabelledExample[] = labelled.map(({ tx, text }, i) => ({
-    vector: vectors[i],
+  const examples: LabelledExample[] = labelled.map(({ tx, text }) => ({
+    vector: vector(text),
     lexical: lexicalProfile(text),
+    account: tx.counterparty_account ?? null,
     type: tx.type,
     categoryId: tx.category_id,
     payeeId: tx.payee_id,
@@ -109,11 +118,10 @@ export async function suggestInBrowser(
     transfer: tx.transfer_pair_id !== null,
     recurring: Boolean(tx.recurring_transaction_id),
   }))
-  const vectorOf = new Map(answerable.map((row, i) => [row.tx.id, vectors[labelled.length + i]]))
-  return asked.map(({ tx, text }) => {
-    const vector = vectorOf.get(tx.id)
-    return vector
-      ? suggestFromNeighbours(tx.id, vector, lexicalProfile(text), tx.type, examples)
-      : none(tx)
-  })
+  const isAnswerable = new Set(answerable.map((row) => row.tx.id))
+  return asked.map(({ tx, text }) =>
+    isAnswerable.has(tx.id)
+      ? suggestFromNeighbours(tx.id, vector(text), lexicalProfile(text), tx.type, examples, {}, tx.counterparty_account ?? null)
+      : none(tx),
+  )
 }

@@ -191,3 +191,51 @@ async def test_remote_suggest_none_option_and_upstream_failure(session, test_tra
     async with httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(401))) as http:
         with pytest.raises(decision_service.DecisionUpstreamError, match="upstream_401"):
             await decision_service.suggest(session, tx.workspace_id, [tx.id], settings, client=http)
+
+
+def test_counterparty_reads_only_the_other_side():
+    from app.services.counterparty import counterparty
+
+    eb = {
+        "credit_debit_indicator": "DBIT",
+        "creditor": {"name": "BILLA AG"},
+        "creditor_account": {"iban": "at61 1904 3002 3457 3201"},
+        "debtor": {"name": "Account Holder"},
+        "debtor_account": {"iban": "AT00 0000 0000 0000 0000"},
+    }
+    assert counterparty(eb, "debit") == ("BILLA AG", "AT611904300234573201")
+    # Money in: the debtor is the counterparty.
+    assert counterparty(eb, "credit") == ("Account Holder", "AT000000000000000000")
+    # No fallback to the account holder's own side.
+    assert counterparty({"credit_debit_indicator": "DBIT", "debtor": {"name": "Me"}}, "debit") == (None, None)
+    pluggy = {"paymentData": {"receiver": {"name": "Joao", "routingNumber": "260", "branchNumber": "0001", "accountNumber": "123"}}}
+    assert counterparty(pluggy, "debit") == ("Joao", "260-0001-123")
+    assert counterparty(None, "debit") == (None, None)
+    assert counterparty({"description": "x"}, "debit") == (None, None)
+
+
+@pytest.mark.asyncio
+async def test_counterparty_reaches_the_api_and_the_remote_state_without_iban(
+    client, auth_headers, session, test_transactions
+):
+    from app.schemas.transaction import TransactionRead
+
+    tx = test_transactions[4]
+    tx.description = "VISA Debitkartenumsatz vom 14.08.2026"
+    tx.raw_data = {
+        "credit_debit_indicator": "DBIT",
+        "creditor": {"name": "NETFLIX.COM"},
+        "creditor_account": {"iban": "NL91ABNA0417164300"},
+    }
+    await session.commit()
+
+    response = await client.get(f"/api/transactions/{tx.id}", headers=auth_headers)
+    assert response.json()["counterparty_name"] == "NETFLIX.COM"
+    assert response.json()["counterparty_account"] == "NL91ABNA0417164300"
+
+    shared = TransactionRead.model_validate({**response.json(), "is_shared": True})
+    assert shared.counterparty_name is None and shared.counterparty_account is None
+
+    state = decision_service.transaction_state(tx)
+    assert state["counterparty"] == "NETFLIX.COM"
+    assert "NL91" not in json.dumps(state)

@@ -13,6 +13,8 @@ export interface LexicalProfile {
 export interface LabelledExample {
   vector: ArrayLike<number>
   lexical: LexicalProfile
+  /** The counterparty's IBAN or account number, when the bank sent one. */
+  account: string | null
   type: 'debit' | 'credit'
   categoryId: string | null
   payeeId: string | null
@@ -159,7 +161,8 @@ function vote<K>(neighbours: { weight: number; key: K | null }[], total: number)
  * Suggest a category, payee and the transfer and recurring hints from the
  * closest labelled examples.
  *
- * Similarity is the better of two signals: the embedding's cosine (vectors
+ * A neighbour paid to or from the same counterparty account (IBAN) is an
+ * exact match. Otherwise similarity is the better of two signals: the embedding's cosine (vectors
  * must be L2-normalised), which groups merchants of the same kind, and the
  * trigram overlap, which catches one merchant written two ways. Category
  * and the hints are voted on by every neighbour; the payee only by the
@@ -178,12 +181,15 @@ export function suggestFromNeighbours(
   type: 'debit' | 'credit',
   examples: LabelledExample[],
   options: KnnOptions = {},
+  account: string | null = null,
 ): DecisionSuggestion {
   const k = options.k ?? DEFAULT_K
   const minSimilarity = options.minSimilarity ?? DEFAULT_MIN_SIMILARITY
   const neighbours = examples
     .filter((example) => example.type === type)
     .map((example) => {
+      // One counterparty account is one payee, whatever the text says.
+      if (account && example.account === account) return { example, similarity: 1, merchant: true }
       const dice = lexicalSimilarity(lexical, example.lexical)
       return {
         example,

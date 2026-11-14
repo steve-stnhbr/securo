@@ -166,6 +166,20 @@ class Transaction(Base):
     matched_amount = cast(Optional[Decimal], None)
     matched_amount_primary = cast(Optional[Decimal], None)
 
+    @property
+    def counterparty_name(self) -> Optional[str]:
+        """The other side's name from the bank's raw data, when it sent one."""
+        from app.services.counterparty import counterparty
+
+        return counterparty(self.raw_data, self.type)[0]
+
+    @property
+    def counterparty_account(self) -> Optional[str]:
+        """The other side's IBAN (or local account number), when the bank sent one."""
+        from app.services.counterparty import counterparty
+
+        return counterparty(self.raw_data, self.type)[1]
+
 
 # Safety net: `effective_date` is NOT NULL. For non-CC transactions it always
 # equals `date`, so if a call site (or test) forgets to set it, fall back
