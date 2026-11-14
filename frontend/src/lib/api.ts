@@ -1766,6 +1766,59 @@ export const backup = {
 }
 
 // Admin
+export type DecisionEngine = 'off' | 'browser' | 'remote'
+
+export interface DecisionModelSettings {
+  engine: DecisionEngine
+  remote_url: string
+  remote_model: string
+  api_key_configured: boolean
+  /** A key is stored but no longer decrypts; it has to be entered again. */
+  api_key_invalid: boolean
+  browser_model: string
+  default_browser_model: string
+  can_store_secrets: boolean
+}
+
+export type DecisionModelSettingsPatch = Partial<{
+  engine: DecisionEngine
+  remote_url: string | null
+  remote_model: string | null
+  api_key: string | null
+  browser_model: string | null
+}>
+
+export interface DecisionConfig {
+  engine: DecisionEngine
+  browser_model: string | null
+  remote_model: string | null
+}
+
+/** One transaction's suggestion; the same shape from either engine. */
+export interface DecisionSuggestion {
+  transaction_id: string
+  category_id: string | null
+  category_probability: number | null
+  category_confidence: number | null
+  payee_id: string | null
+  payee_name: string | null
+  payee_probability: number | null
+  transfer_probability: number | null
+  recurring_probability: number | null
+  error: string | null
+}
+
+export const decisions = {
+  config: async (): Promise<DecisionConfig> => {
+    const { data } = await api.get('/decisions/config')
+    return data
+  },
+  suggest: async (transactionIds: string[]): Promise<{ model: string; suggestions: DecisionSuggestion[] }> => {
+    const { data } = await api.post('/decisions/suggest', { transaction_ids: transactionIds })
+    return data
+  },
+}
+
 export interface ProviderSettingStatus {
   name: string
   configured: boolean
@@ -1826,6 +1879,14 @@ export const admin = {
     values: Record<string, string | boolean | null>,
   ): Promise<ProviderSettingStatus> => {
     const { data } = await api.patch(`/admin/provider-settings/${encodeURIComponent(provider)}`, { values })
+    return data
+  },
+  decisionModel: async (): Promise<DecisionModelSettings> => {
+    const { data } = await api.get('/admin/decision-model')
+    return data
+  },
+  updateDecisionModel: async (patch: DecisionModelSettingsPatch): Promise<DecisionModelSettings> => {
+    const { data } = await api.patch('/admin/decision-model', patch)
     return data
   },
   getSetting: async (key: string): Promise<AppSetting> => {

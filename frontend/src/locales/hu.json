@@ -3673,5 +3673,61 @@
       "title": "Ismétlődő bevétel",
       "hint": "Amit az ismétlődő számlák havonta hoznak, és ami nemrég elveszett."
     }
+  },
+  "decisionModel": {
+    "title": "Tranzakciójavaslatok",
+    "description": "Kategóriákat és partnereket javasol a kategorizálatlan tranzakciókhoz egy döntési modellel, amely minden felhasználó böngészőjében vagy egy távoli API-n keresztül fut.",
+    "engineLabel": "Javaslatmotor",
+    "engines": {
+      "off": {
+        "title": "Ki",
+        "description": "Nincsenek javaslatok."
+      },
+      "browser": {
+        "title": "A böngészőben",
+        "description": "Egy kis modell fut minden felhasználó böngészőjében (WebGPU vagy WebAssembly), és a kategorizált tranzakcióiból tanul. A tranzakciók sosem hagyják el a böngészőt."
+      },
+      "remote": {
+        "title": "Távoli döntési API",
+        "description": "A szerver egy döntési modellt kérdez le (például Jev vagy Clef, illetve saját szerveren futó Ollaya esetén Kev és Laya)."
+      }
+    },
+    "browserModel": "Embedding-modell",
+    "browserModelHelp": "Mondat-embedding modell a Hugging Face-en, ONNX-súlyokkal. Minden böngésző egyszer tölti le, és gyorsítótárazza. Alapértelmezett: {{model}}",
+    "preset": "Szolgáltatás",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, saját szerveren (Kev, Laya, Clef)",
+      "custom": "Egyéni"
+    },
+    "remoteUrl": "Végpont URL-je",
+    "remoteModel": "Modell",
+    "apiKey": "API-kulcs",
+    "apiKeyPlaceholder": "Illeszd be az API-kulcsot",
+    "apiKeySaved": "Mentve. A cseréhez adj meg új kulcsot",
+    "apiKeyInvalid": "A mentett kulcs már nem fejthető vissza. Add meg újra.",
+    "removeApiKey": "Kulcs eltávolítása",
+    "cannotStoreSecrets": "API-kulcs tárolásához állíts be egy egyedi, legalább 32 karakteres SECRET_KEY-t.",
+    "remotePrivacy": "Minden javaslat elküldi ennek a szolgáltatásnak a tranzakció leírását és partnerét (az IBAN-okat és a hosszú számokat kitakarva), az összeget, a pénznemet, valamint a kategóriáid és partnereid nevét.",
+    "remoteIncomplete": "Adj meg egy végpont URL-t és egy modellt.",
+    "saveFailed": "A beállításokat nem sikerült menteni. Ellenőrizd az URL-t és a modellt."
+  },
+  "decisionSuggestions": {
+    "open": "Javaslat",
+    "title": "Javasolt kategóriák",
+    "engineBrowser": "Ebben a böngészőben, a kategorizált tranzakcióid alapján készült.",
+    "engineRemote": "A(z) {{model}} döntési modelltől.",
+    "readingHistory": "Kategorizált tranzakciók beolvasása…",
+    "downloadingModel": "Modell letöltése… {{percent}}%",
+    "thinking": "Javaslatok készítése…",
+    "failed": "Nem sikerült javaslatokat készíteni.",
+    "none": "Nincsenek javaslatok a megjelenített tranzakciókhoz.",
+    "unknownCategory": "Ismeretlen kategória",
+    "payee": "Partner: {{name}}",
+    "looksLikeTransfer": "Átvezetésnek tűnik",
+    "looksRecurring": "Ismétlődőnek tűnik",
+    "apply": "Alkalmazás ({{count}})",
+    "applied": "Alkalmazott javaslatok: {{count}}"
   }
 }

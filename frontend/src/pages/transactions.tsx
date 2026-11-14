@@ -8,7 +8,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useDisplayLocale, useDateLocale } from '@/hooks/use-display-locale'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { transactions, categories as categoriesApi, categoryGroups as categoryGroupsApi, accounts as accountsApi, recurring, payees as payeesApi, admin, groups as groupsApi, rules as rulesApi, reconciliation as reconciliationApi } from '@/lib/api'
+import { decisions, transactions, categories as categoriesApi, categoryGroups as categoryGroupsApi, accounts as accountsApi, recurring, payees as payeesApi, admin, groups as groupsApi, rules as rulesApi, reconciliation as reconciliationApi } from '@/lib/api'
 import { invalidateFinancialQueries } from '@/lib/invalidate-queries'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -62,6 +62,8 @@ import { extractApiError } from '@/lib/api-errors'
 import { refreshTransactionsView } from '@/lib/transactions-refresh'
 import { TransactionsColumnPicker } from '@/components/transactions-column-picker'
 import { TransactionsPageActions } from '@/components/transactions-page-actions'
+import { SuggestTransactionsDialog } from '@/components/suggest-transactions-dialog'
+import { suggestableTransactions } from '@/lib/decisions/ui-helpers'
 import { MobileBulkSelectionActions } from '@/components/mobile-bulk-selection-actions'
 import { type ColumnDef, type ColumnId, useTransactionsGridState } from '@/components/transactions-grid-columns'
 import { TransferDialog } from '@/components/transfer-dialog'
@@ -227,6 +229,7 @@ export default function TransactionsPage() {
   }
   const [exporting, setExporting] = useState(false)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
+  const [suggestOpen, setSuggestOpen] = useState(false)
   const [linkTransferDialogOpen, setLinkTransferDialogOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null)
@@ -492,6 +495,12 @@ export default function TransactionsPage() {
     enabled: filterCategoryIds.length > 0,
   })
 
+  // Which engine (if any) the administrator chose for suggestions.
+  const { data: decisionConfig } = useQuery({
+    queryKey: ['decision-config'],
+    queryFn: () => decisions.config(),
+    staleTime: 5 * 60_000,
+  })
   const { data: categoryGroupsList } = useQuery({
     queryKey: ['categoryGroups'],
     queryFn: categoryGroupsApi.list,
@@ -794,6 +803,7 @@ export default function TransactionsPage() {
   // Tag filtering is now applied server-side, so the visible list and the
   // page count both reflect the same filtered total — issue #88.
   const filteredItems = useMemo(() => data?.items ?? [], [data?.items])
+  const suggestable = useMemo(() => suggestableTransactions(filteredItems), [filteredItems])
   const selectableItems = filteredItems.filter(tx => !tx.is_shared)
 
   // Group transactions by date for the mobile card view
@@ -1461,6 +1471,7 @@ export default function TransactionsPage() {
             onAdd={canWrite ? () => { setEditingTx(null); setDialogOpen(true) } : undefined}
             onDuplicate={duplicableTx ? () => handleDuplicateTransaction(duplicableTx) : undefined}
             onTransfer={canWrite ? () => setTransferDialogOpen(true) : undefined}
+            onSuggest={canWrite && decisionConfig && decisionConfig.engine !== 'off' && suggestable.length ? () => setSuggestOpen(true) : undefined}
             onRefresh={noAccounts ? undefined : () => {
               void refreshTransactionsView({
                 viewMode,
@@ -2188,6 +2199,15 @@ export default function TransactionsPage() {
       />
 
       {/* Transfer Dialog */}
+      {decisionConfig && decisionConfig.engine !== 'off' && (
+        <SuggestTransactionsDialog
+          open={suggestOpen}
+          onOpenChange={setSuggestOpen}
+          config={decisionConfig}
+          transactions={suggestable}
+          categories={categoriesList ?? []}
+        />
+      )}
       <TransferDialog
         open={transferDialogOpen}
         onClose={() => setTransferDialogOpen(false)}

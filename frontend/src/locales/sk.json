@@ -3843,5 +3843,61 @@
       "title": "Opakované príjmy",
       "hint": "Čo mesačne prinášajú opakované faktúry a čo sa nedávno stratilo."
     }
+  },
+  "decisionModel": {
+    "title": "Návrhy transakcií",
+    "description": "Navrhuje kategórie a príjemcov pre transakcie bez kategórie pomocou rozhodovacieho modelu, ktorý beží buď v prehliadači každého používateľa, alebo cez vzdialené API.",
+    "engineLabel": "Zdroj návrhov",
+    "engines": {
+      "off": {
+        "title": "Vypnuté",
+        "description": "Žiadne návrhy."
+      },
+      "browser": {
+        "title": "V prehliadači",
+        "description": "Malý model beží v prehliadači každého používateľa (WebGPU alebo WebAssembly) a učí sa z jeho kategorizovaných transakcií. Transakcie nikdy neopustia prehliadač."
+      },
+      "remote": {
+        "title": "Vzdialené rozhodovacie API",
+        "description": "Server sa pýta rozhodovacieho modelu, ako je Jev alebo Clef, prípadne Kev a Laya na vlastnom serveri Ollaya."
+      }
+    },
+    "browserModel": "Embeddingový model",
+    "browserModelHelp": "Model na embedding viet na Hugging Face s váhami ONNX. Každý prehliadač ho stiahne raz a uloží do vyrovnávacej pamäte. Predvolené: {{model}}",
+    "preset": "Služba",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, na vlastnom serveri (Kev, Laya, Clef)",
+      "custom": "Vlastná"
+    },
+    "remoteUrl": "URL endpointu",
+    "remoteModel": "Model",
+    "apiKey": "API kľúč",
+    "apiKeyPlaceholder": "Vložte API kľúč",
+    "apiKeySaved": "Uložené. Na nahradenie zadajte nový kľúč",
+    "apiKeyInvalid": "Uložený kľúč sa už nedá dešifrovať. Zadajte ho znova.",
+    "removeApiKey": "Odstrániť kľúč",
+    "cannotStoreSecrets": "Na uloženie API kľúča nastavte jedinečný SECRET_KEY s aspoň 32 znakmi.",
+    "remotePrivacy": "Každý návrh odošle tejto službe popis a príjemcu transakcie (s maskovanými IBAN a dlhými číslami), sumu, menu a názvy vašich kategórií a príjemcov.",
+    "remoteIncomplete": "Zadajte URL endpointu a model.",
+    "saveFailed": "Nastavenia sa nepodarilo uložiť. Skontrolujte URL a model."
+  },
+  "decisionSuggestions": {
+    "open": "Navrhnúť",
+    "title": "Navrhované kategórie",
+    "engineBrowser": "Vypočítané v tomto prehliadači z vašich kategorizovaných transakcií.",
+    "engineRemote": "Z rozhodovacieho modelu {{model}}.",
+    "readingHistory": "Načítavajú sa vaše kategorizované transakcie…",
+    "downloadingModel": "Sťahuje sa model… {{percent}}%",
+    "thinking": "Pripravujú sa návrhy…",
+    "failed": "Návrhy sa nepodarilo pripraviť.",
+    "none": "Pre zobrazené transakcie nie sú žiadne návrhy.",
+    "unknownCategory": "Neznáma kategória",
+    "payee": "Príjemca: {{name}}",
+    "looksLikeTransfer": "Vyzerá ako prevod",
+    "looksRecurring": "Vyzerá ako opakovaná",
+    "apply": "Použiť ({{count}})",
+    "applied": "Použité návrhy: {{count}}"
   }
 }

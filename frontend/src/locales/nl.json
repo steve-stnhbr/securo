@@ -3675,5 +3675,61 @@
       "title": "Terugkerende omzet",
       "hint": "Wat terugkerende facturen per maand opleveren, en wat onlangs verloren ging."
     }
+  },
+  "decisionModel": {
+    "title": "Transactiesuggesties",
+    "description": "Stel categorieën en begunstigden voor bij niet-gecategoriseerde transacties met een beslismodel, dat in de browser van elke gebruiker draait of via een externe API.",
+    "engineLabel": "Suggestie-engine",
+    "engines": {
+      "off": {
+        "title": "Uit",
+        "description": "Geen suggesties."
+      },
+      "browser": {
+        "title": "In de browser",
+        "description": "Een klein model draait in de browser van elke gebruiker (WebGPU of WebAssembly) en leert van diens gecategoriseerde transacties. Transacties verlaten de browser nooit."
+      },
+      "remote": {
+        "title": "Externe beslis-API",
+        "description": "De server raadpleegt een beslismodel zoals Jev of Clef, of Kev en Laya op een zelf gehoste Ollaya-server."
+      }
+    },
+    "browserModel": "Embeddingmodel",
+    "browserModelHelp": "Een zin-embeddingmodel op Hugging Face met ONNX-gewichten. Elke browser downloadt het één keer en slaat het op in de cache. Standaard: {{model}}",
+    "preset": "Dienst",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, zelf gehost (Kev, Laya, Clef)",
+      "custom": "Aangepast"
+    },
+    "remoteUrl": "Endpoint-URL",
+    "remoteModel": "Model",
+    "apiKey": "API-sleutel",
+    "apiKeyPlaceholder": "Plak de API-sleutel",
+    "apiKeySaved": "Opgeslagen. Voer een nieuwe sleutel in om deze te vervangen",
+    "apiKeyInvalid": "De opgeslagen sleutel kan niet meer worden ontsleuteld. Voer hem opnieuw in.",
+    "removeApiKey": "Sleutel verwijderen",
+    "cannotStoreSecrets": "Stel een unieke SECRET_KEY van minstens 32 tekens in om een API-sleutel op te slaan.",
+    "remotePrivacy": "Elke suggestie stuurt de omschrijving en begunstigde van de transactie (met IBAN's en lange nummers gemaskeerd), het bedrag, de valuta en je categorie- en begunstigdennamen naar deze dienst.",
+    "remoteIncomplete": "Voer een endpoint-URL en een model in.",
+    "saveFailed": "De instellingen konden niet worden opgeslagen. Controleer de URL en het model."
+  },
+  "decisionSuggestions": {
+    "open": "Voorstellen",
+    "title": "Voorgestelde categorieën",
+    "engineBrowser": "In deze browser bepaald op basis van je gecategoriseerde transacties.",
+    "engineRemote": "Van het beslismodel {{model}}.",
+    "readingHistory": "Je gecategoriseerde transacties worden gelezen…",
+    "downloadingModel": "Model downloaden… {{percent}}%",
+    "thinking": "Suggesties bepalen…",
+    "failed": "Er konden geen suggesties worden bepaald.",
+    "none": "Geen suggesties voor de getoonde transacties.",
+    "unknownCategory": "Onbekende categorie",
+    "payee": "Begunstigde: {{name}}",
+    "looksLikeTransfer": "Lijkt op een overdracht",
+    "looksRecurring": "Lijkt terugkerend",
+    "apply": "Toepassen ({{count}})",
+    "applied": "Suggesties toegepast: {{count}}"
   }
 }

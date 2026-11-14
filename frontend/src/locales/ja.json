@@ -3673,5 +3673,61 @@
       "title": "定期収益",
       "hint": "定期請求書による毎月の収益と、最近失われた分。"
     }
+  },
+  "decisionModel": {
+    "title": "取引の提案",
+    "description": "決定モデルを使って、未分類の取引にカテゴリと取引相手を提案します。モデルは各ユーザーのブラウザ内、またはリモートAPI経由で実行されます。",
+    "engineLabel": "提案エンジン",
+    "engines": {
+      "off": {
+        "title": "オフ",
+        "description": "提案しません。"
+      },
+      "browser": {
+        "title": "ブラウザ内",
+        "description": "小さなモデルが各ユーザーのブラウザ（WebGPUまたはWebAssembly）で動作し、分類済みの取引から学習します。取引がブラウザの外に送られることはありません。"
+      },
+      "remote": {
+        "title": "リモート決定API",
+        "description": "サーバーがJevやClefなどの決定モデル、またはセルフホストのOllayaサーバー上のKevやLayaに問い合わせます。"
+      }
+    },
+    "browserModel": "埋め込みモデル",
+    "browserModelHelp": "Hugging Face上の、ONNXの重みを持つ文埋め込みモデルです。各ブラウザが一度ダウンロードしてキャッシュします。デフォルト: {{model}}",
+    "preset": "サービス",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya、セルフホスト（Kev、Laya、Clef）",
+      "custom": "カスタム"
+    },
+    "remoteUrl": "エンドポイントURL",
+    "remoteModel": "モデル",
+    "apiKey": "APIキー",
+    "apiKeyPlaceholder": "APIキーを貼り付け",
+    "apiKeySaved": "保存済みです。置き換えるには新しいキーを入力してください",
+    "apiKeyInvalid": "保存されたキーを復号できなくなりました。もう一度入力してください。",
+    "removeApiKey": "キーを削除",
+    "cannotStoreSecrets": "APIキーを保存するには、32文字以上の固有のSECRET_KEYを設定してください。",
+    "remotePrivacy": "提案のたびに、取引の説明と取引相手（IBANや長い番号はマスク）、金額、通貨、およびカテゴリと取引相手の名前がこのサービスに送信されます。",
+    "remoteIncomplete": "エンドポイントURLとモデルを入力してください。",
+    "saveFailed": "設定を保存できませんでした。URLとモデルを確認してください。"
+  },
+  "decisionSuggestions": {
+    "open": "提案",
+    "title": "カテゴリの提案",
+    "engineBrowser": "分類済みの取引をもとに、このブラウザ内で算出しました。",
+    "engineRemote": "決定モデル {{model}} による提案です。",
+    "readingHistory": "分類済みの取引を読み込んでいます…",
+    "downloadingModel": "モデルをダウンロードしています… {{percent}}%",
+    "thinking": "提案を算出しています…",
+    "failed": "提案を算出できませんでした。",
+    "none": "表示中の取引に提案はありません。",
+    "unknownCategory": "不明なカテゴリ",
+    "payee": "取引相手: {{name}}",
+    "looksLikeTransfer": "振替のようです",
+    "looksRecurring": "定期取引のようです",
+    "apply": "適用 ({{count}})",
+    "applied": "提案を適用しました: {{count}}"
   }
 }

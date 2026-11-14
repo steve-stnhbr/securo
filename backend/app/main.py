@@ -52,6 +52,7 @@ from app.api.access_tokens import router as access_tokens_router
 from app.api.plugins import router as plugins_router
 from app.api.ui_layouts import router as ui_layouts_router
 from app.api.admin import router as admin_router, check_registration_enabled
+from app.api.decisions import router as decisions_router
 from app.core.auth import fastapi_users
 from app.core.auth_policy import require_local_auth_enabled
 from app.core.config import get_settings
@@ -216,6 +217,7 @@ app.include_router(access_tokens_router)
 app.include_router(plugins_router)
 app.include_router(ui_layouts_router)
 app.include_router(admin_router)
+app.include_router(decisions_router)
 app.include_router(info_router)
 
 

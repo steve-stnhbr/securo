@@ -27,7 +27,8 @@ from app.schemas.admin import (
     TimezoneSettingRead,
 )
 from app.services import admin_service
-from app.services import provider_settings
+from app.schemas.decision import DecisionModelSettingsRead
+from app.services import decision_settings, provider_settings
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -127,7 +128,7 @@ async def get_setting(
     session: AsyncSession = Depends(get_async_session),
     _user: User = Depends(current_superuser),
 ):
-    if key in provider_settings.SETTING_FIELDS:
+    if key in provider_settings.SETTING_FIELDS or key in decision_settings.HIDDEN_KEYS:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Setting not found")
     setting = await admin_service.get_app_setting(session, key)
     if not setting:
@@ -161,6 +162,34 @@ async def update_provider_settings(
         raise HTTPException(status_code=409, detail=str(exc)) from None
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid provider settings") from None
+
+
+@router.get("/decision-model", response_model=DecisionModelSettingsRead)
+async def get_decision_model(
+    session: AsyncSession = Depends(get_async_session),
+    _user: User = Depends(current_superuser),
+):
+    return decision_settings.admin_view(await decision_settings.load_settings(session))
+
+
+@router.patch("/decision-model", response_model=DecisionModelSettingsRead)
+async def update_decision_model(
+    request: Request,
+    session: AsyncSession = Depends(get_async_session),
+    _user: User = Depends(current_superuser),
+):
+    # Parsed by hand, like provider settings, so a validation error can
+    # never echo the submitted API key.
+    try:
+        body = await request.json()
+        if not isinstance(body, dict):
+            raise ValueError("Invalid decision model settings")
+        saved = await decision_settings.update_settings(session, body)
+    except provider_settings.SecretStorageUnavailable as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from None
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid decision model settings") from None
+    return decision_settings.admin_view(saved)
 
 
 @router.patch("/settings/{key}", response_model=AppSettingRead)

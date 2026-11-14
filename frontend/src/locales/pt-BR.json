@@ -3677,5 +3677,61 @@
       "title": "Receita recorrente",
       "hint": "Quanto as cobranças recorrentes trazem por mês, e o que foi perdido recentemente."
     }
+  },
+  "decisionModel": {
+    "title": "Sugestões de transações",
+    "description": "Sugere categorias e pessoas para transações sem categoria com um modelo de decisão, executado no navegador de cada usuário ou por meio de uma API remota.",
+    "engineLabel": "Mecanismo de sugestões",
+    "engines": {
+      "off": {
+        "title": "Desativado",
+        "description": "Sem sugestões."
+      },
+      "browser": {
+        "title": "No navegador",
+        "description": "Um modelo pequeno roda no navegador de cada usuário (WebGPU ou WebAssembly) e aprende com as transações categorizadas dele. As transações nunca saem do navegador."
+      },
+      "remote": {
+        "title": "API de decisão remota",
+        "description": "O servidor consulta um modelo de decisão como Jev ou Clef, ou Kev e Laya em um servidor Ollaya self-hosted."
+      }
+    },
+    "browserModel": "Modelo de embeddings",
+    "browserModelHelp": "Um modelo de embeddings de frases no Hugging Face com pesos ONNX. Cada navegador o baixa uma vez e o mantém em cache. Padrão: {{model}}",
+    "preset": "Serviço",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, self-hosted (Kev, Laya, Clef)",
+      "custom": "Personalizado"
+    },
+    "remoteUrl": "URL do endpoint",
+    "remoteModel": "Modelo",
+    "apiKey": "Chave de API",
+    "apiKeyPlaceholder": "Cole a chave de API",
+    "apiKeySaved": "Salva. Digite uma nova chave para substituí-la",
+    "apiKeyInvalid": "A chave salva não pode mais ser descriptografada. Digite-a novamente.",
+    "removeApiKey": "Remover chave",
+    "cannotStoreSecrets": "Defina um SECRET_KEY único com pelo menos 32 caracteres para salvar uma chave de API.",
+    "remotePrivacy": "Cada sugestão envia a este serviço a descrição e a pessoa da transação (com IBANs e números longos mascarados), o valor, a moeda e os nomes das suas categorias e pessoas.",
+    "remoteIncomplete": "Informe uma URL do endpoint e um modelo.",
+    "saveFailed": "Não foi possível salvar as configurações. Verifique a URL e o modelo."
+  },
+  "decisionSuggestions": {
+    "open": "Sugerir",
+    "title": "Categorias sugeridas",
+    "engineBrowser": "Calculadas neste navegador a partir das suas transações categorizadas.",
+    "engineRemote": "Do modelo de decisão {{model}}.",
+    "readingHistory": "Lendo suas transações categorizadas…",
+    "downloadingModel": "Baixando o modelo… {{percent}}%",
+    "thinking": "Calculando sugestões…",
+    "failed": "Não foi possível calcular as sugestões.",
+    "none": "Nenhuma sugestão para as transações exibidas.",
+    "unknownCategory": "Categoria desconhecida",
+    "payee": "Pessoa: {{name}}",
+    "looksLikeTransfer": "Parece uma transferência",
+    "looksRecurring": "Parece recorrente",
+    "apply": "Aplicar ({{count}})",
+    "applied": "Sugestões aplicadas: {{count}}"
   }
 }

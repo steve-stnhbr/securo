@@ -3677,5 +3677,61 @@
       "title": "Entrate ricorrenti",
       "hint": "Quanto portano le fatture ricorrenti ogni mese, e cosa si è perso di recente."
     }
+  },
+  "decisionModel": {
+    "title": "Suggerimenti per le transazioni",
+    "description": "Suggerisce categorie e beneficiari per le transazioni senza categoria con un modello decisionale, eseguito nel browser di ogni utente o tramite un'API remota.",
+    "engineLabel": "Motore dei suggerimenti",
+    "engines": {
+      "off": {
+        "title": "Disattivo",
+        "description": "Nessun suggerimento."
+      },
+      "browser": {
+        "title": "Nel browser",
+        "description": "Un piccolo modello viene eseguito nel browser di ogni utente (WebGPU o WebAssembly) e impara dalle sue transazioni categorizzate. Le transazioni non lasciano mai il browser."
+      },
+      "remote": {
+        "title": "API decisionale remota",
+        "description": "Il server interroga un modello decisionale come Jev o Clef, oppure Kev e Laya su un server Ollaya self-hosted."
+      }
+    },
+    "browserModel": "Modello di embedding",
+    "browserModelHelp": "Un modello di embedding di frasi su Hugging Face con pesi ONNX. Ogni browser lo scarica una volta e lo mette in cache. Predefinito: {{model}}",
+    "preset": "Servizio",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, self-hosted (Kev, Laya, Clef)",
+      "custom": "Personalizzato"
+    },
+    "remoteUrl": "URL dell'endpoint",
+    "remoteModel": "Modello",
+    "apiKey": "Chiave API",
+    "apiKeyPlaceholder": "Incolla la chiave API",
+    "apiKeySaved": "Salvata. Inserisci una nuova chiave per sostituirla",
+    "apiKeyInvalid": "La chiave salvata non può più essere decifrata. Inseriscila di nuovo.",
+    "removeApiKey": "Rimuovi chiave",
+    "cannotStoreSecrets": "Imposta un SECRET_KEY univoco di almeno 32 caratteri per salvare una chiave API.",
+    "remotePrivacy": "Ogni suggerimento invia a questo servizio la descrizione e il beneficiario della transazione (con IBAN e numeri lunghi mascherati), l'importo, la valuta e i nomi delle tue categorie e dei tuoi beneficiari.",
+    "remoteIncomplete": "Inserisci un URL dell'endpoint e un modello.",
+    "saveFailed": "Non è stato possibile salvare le impostazioni. Controlla l'URL e il modello."
+  },
+  "decisionSuggestions": {
+    "open": "Suggerisci",
+    "title": "Categorie suggerite",
+    "engineBrowser": "Calcolate in questo browser dalle tue transazioni categorizzate.",
+    "engineRemote": "Dal modello decisionale {{model}}.",
+    "readingHistory": "Lettura delle tue transazioni categorizzate…",
+    "downloadingModel": "Download del modello… {{percent}}%",
+    "thinking": "Calcolo dei suggerimenti…",
+    "failed": "Impossibile calcolare i suggerimenti.",
+    "none": "Nessun suggerimento per le transazioni mostrate.",
+    "unknownCategory": "Categoria sconosciuta",
+    "payee": "Beneficiario: {{name}}",
+    "looksLikeTransfer": "Sembra un trasferimento",
+    "looksRecurring": "Sembra ricorrente",
+    "apply": "Applica ({{count}})",
+    "applied": "Suggerimenti applicati: {{count}}"
   }
 }

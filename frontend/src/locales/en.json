@@ -3673,5 +3673,61 @@
       "title": "Recurring revenue",
       "hint": "What recurring invoices bring in each month, and what was lost lately."
     }
+  },
+  "decisionModel": {
+    "title": "Transaction suggestions",
+    "description": "Suggest categories and payees for uncategorized transactions with a decision model, run either in each user's browser or through a remote API.",
+    "engineLabel": "Suggestion engine",
+    "engines": {
+      "off": {
+        "title": "Off",
+        "description": "No suggestions."
+      },
+      "browser": {
+        "title": "In the browser",
+        "description": "A small model runs in each user's browser (WebGPU or WebAssembly) and learns from their categorized transactions. Transactions never leave the browser."
+      },
+      "remote": {
+        "title": "Remote decision API",
+        "description": "The server asks a decision model such as Jev or Clef, or Kev and Laya on a self-hosted Ollaya server."
+      }
+    },
+    "browserModel": "Embedding model",
+    "browserModelHelp": "A sentence-embedding model on Hugging Face with ONNX weights. Each browser downloads it once and caches it. Default: {{model}}",
+    "preset": "Service",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, self-hosted (Kev, Laya, Clef)",
+      "custom": "Custom"
+    },
+    "remoteUrl": "Endpoint URL",
+    "remoteModel": "Model",
+    "apiKey": "API key",
+    "apiKeyPlaceholder": "Paste the API key",
+    "apiKeySaved": "Saved. Enter a new key to replace it",
+    "apiKeyInvalid": "The saved key can no longer be decrypted. Enter it again.",
+    "removeApiKey": "Remove key",
+    "cannotStoreSecrets": "Set a unique SECRET_KEY of at least 32 characters to store an API key.",
+    "remotePrivacy": "Each suggestion sends the transaction's description and payee (with IBANs and long numbers masked), amount, currency, and your category and payee names to this service.",
+    "remoteIncomplete": "Enter an endpoint URL and a model.",
+    "saveFailed": "The settings could not be saved. Check the URL and the model."
+  },
+  "decisionSuggestions": {
+    "open": "Suggest",
+    "title": "Suggested categories",
+    "engineBrowser": "Worked out in this browser from your categorized transactions.",
+    "engineRemote": "From the decision model {{model}}.",
+    "readingHistory": "Reading your categorized transactions…",
+    "downloadingModel": "Downloading the model… {{percent}}%",
+    "thinking": "Working out suggestions…",
+    "failed": "Suggestions could not be worked out.",
+    "none": "No suggestions for the transactions shown.",
+    "unknownCategory": "Unknown category",
+    "payee": "Payee: {{name}}",
+    "looksLikeTransfer": "Looks like a transfer",
+    "looksRecurring": "Looks recurring",
+    "apply": "Apply ({{count}})",
+    "applied": "Suggestions applied: {{count}}"
   }
 }

@@ -3809,5 +3809,61 @@
       "title": "Przychody cykliczne",
       "hint": "Ile co miesiąc przynoszą faktury cykliczne i co ostatnio utracono."
     }
+  },
+  "decisionModel": {
+    "title": "Sugestie dla transakcji",
+    "description": "Sugeruje kategorie i odbiorców dla nieskategoryzowanych transakcji za pomocą modelu decyzyjnego, uruchamianego w przeglądarce każdego użytkownika lub przez zdalne API.",
+    "engineLabel": "Silnik sugestii",
+    "engines": {
+      "off": {
+        "title": "Wyłączone",
+        "description": "Brak sugestii."
+      },
+      "browser": {
+        "title": "W przeglądarce",
+        "description": "Mały model działa w przeglądarce każdego użytkownika (WebGPU lub WebAssembly) i uczy się na jego skategoryzowanych transakcjach. Transakcje nigdy nie opuszczają przeglądarki."
+      },
+      "remote": {
+        "title": "Zdalne API decyzyjne",
+        "description": "Serwer odpytuje model decyzyjny, np. Jev lub Clef, albo Kev i Laya na samodzielnie hostowanym serwerze Ollaya."
+      }
+    },
+    "browserModel": "Model embeddingów",
+    "browserModelHelp": "Model embeddingów zdań z Hugging Face z wagami ONNX. Każda przeglądarka pobiera go raz i zapisuje w pamięci podręcznej. Domyślnie: {{model}}",
+    "preset": "Usługa",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, samodzielnie hostowane (Kev, Laya, Clef)",
+      "custom": "Niestandardowa"
+    },
+    "remoteUrl": "Adres URL endpointu",
+    "remoteModel": "Model",
+    "apiKey": "Klucz API",
+    "apiKeyPlaceholder": "Wklej klucz API",
+    "apiKeySaved": "Zapisano. Wpisz nowy klucz, aby go zastąpić",
+    "apiKeyInvalid": "Zapisanego klucza nie można już odszyfrować. Wpisz go ponownie.",
+    "removeApiKey": "Usuń klucz",
+    "cannotStoreSecrets": "Ustaw unikalny SECRET_KEY o długości co najmniej 32 znaków, aby zapisać klucz API.",
+    "remotePrivacy": "Każda sugestia wysyła do tej usługi opis i odbiorcę transakcji (z zamaskowanymi numerami IBAN i długimi numerami), kwotę, walutę oraz nazwy Twoich kategorii i odbiorców.",
+    "remoteIncomplete": "Wpisz adres URL endpointu i model.",
+    "saveFailed": "Nie udało się zapisać ustawień. Sprawdź adres URL i model."
+  },
+  "decisionSuggestions": {
+    "open": "Sugeruj",
+    "title": "Sugerowane kategorie",
+    "engineBrowser": "Wyznaczone w tej przeglądarce na podstawie Twoich skategoryzowanych transakcji.",
+    "engineRemote": "Z modelu decyzyjnego {{model}}.",
+    "readingHistory": "Odczytywanie skategoryzowanych transakcji…",
+    "downloadingModel": "Pobieranie modelu… {{percent}}%",
+    "thinking": "Przygotowywanie sugestii…",
+    "failed": "Nie udało się przygotować sugestii.",
+    "none": "Brak sugestii dla wyświetlanych transakcji.",
+    "unknownCategory": "Nieznana kategoria",
+    "payee": "Odbiorca: {{name}}",
+    "looksLikeTransfer": "Wygląda na transfer",
+    "looksRecurring": "Wygląda na cykliczną",
+    "apply": "Zastosuj ({{count}})",
+    "applied": "Zastosowane sugestie: {{count}}"
   }
 }

@@ -3677,5 +3677,61 @@
       "title": "Revenus récurrents",
       "hint": "Ce que rapportent les factures récurrentes chaque mois, et ce qui a été perdu récemment."
     }
+  },
+  "decisionModel": {
+    "title": "Suggestions de transactions",
+    "description": "Suggère des catégories et des bénéficiaires pour les transactions non catégorisées grâce à un modèle de décision, exécuté dans le navigateur de chaque utilisateur ou via une API distante.",
+    "engineLabel": "Moteur de suggestions",
+    "engines": {
+      "off": {
+        "title": "Désactivé",
+        "description": "Aucune suggestion."
+      },
+      "browser": {
+        "title": "Dans le navigateur",
+        "description": "Un petit modèle s'exécute dans le navigateur de chaque utilisateur (WebGPU ou WebAssembly) et apprend à partir de ses transactions catégorisées. Les transactions ne quittent jamais le navigateur."
+      },
+      "remote": {
+        "title": "API de décision distante",
+        "description": "Le serveur interroge un modèle de décision comme Jev ou Clef, ou Kev et Laya sur un serveur Ollaya auto-hébergé."
+      }
+    },
+    "browserModel": "Modèle d'embedding",
+    "browserModelHelp": "Un modèle d'embedding de phrases sur Hugging Face avec des poids ONNX. Chaque navigateur le télécharge une fois et le met en cache. Par défaut : {{model}}",
+    "preset": "Service",
+    "presets": {
+      "typesafe": "TypeSafe (Jev)",
+      "openrouter": "OpenRouter (Jev)",
+      "ollaya": "Ollaya, auto-hébergé (Kev, Laya, Clef)",
+      "custom": "Personnalisé"
+    },
+    "remoteUrl": "URL du point de terminaison",
+    "remoteModel": "Modèle",
+    "apiKey": "Clé API",
+    "apiKeyPlaceholder": "Collez la clé API",
+    "apiKeySaved": "Enregistrée. Saisissez une nouvelle clé pour la remplacer",
+    "apiKeyInvalid": "La clé enregistrée ne peut plus être déchiffrée. Saisissez-la à nouveau.",
+    "removeApiKey": "Supprimer la clé",
+    "cannotStoreSecrets": "Définissez un SECRET_KEY unique d'au moins 32 caractères pour enregistrer une clé API.",
+    "remotePrivacy": "Chaque suggestion envoie à ce service la description et le bénéficiaire de la transaction (IBAN et numéros longs masqués), le montant, la devise ainsi que les noms de vos catégories et bénéficiaires.",
+    "remoteIncomplete": "Saisissez une URL de point de terminaison et un modèle.",
+    "saveFailed": "Les paramètres n'ont pas pu être enregistrés. Vérifiez l'URL et le modèle."
+  },
+  "decisionSuggestions": {
+    "open": "Suggérer",
+    "title": "Catégories suggérées",
+    "engineBrowser": "Calculées dans ce navigateur à partir de vos transactions catégorisées.",
+    "engineRemote": "Du modèle de décision {{model}}.",
+    "readingHistory": "Lecture de vos transactions catégorisées…",
+    "downloadingModel": "Téléchargement du modèle… {{percent}}%",
+    "thinking": "Calcul des suggestions…",
+    "failed": "Les suggestions n'ont pas pu être calculées.",
+    "none": "Aucune suggestion pour les transactions affichées.",
+    "unknownCategory": "Catégorie inconnue",
+    "payee": "Bénéficiaire : {{name}}",
+    "looksLikeTransfer": "Ressemble à un virement",
+    "looksRecurring": "Semble récurrente",
+    "apply": "Appliquer ({{count}})",
+    "applied": "Suggestions appliquées : {{count}}"
   }
 }
